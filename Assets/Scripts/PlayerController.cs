@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody playerRb;
@@ -15,6 +16,10 @@ public class PlayerController : MonoBehaviour
     public AudioClip jumpSound;
     public AudioClip crashSound;
     private AudioSource playerAudio;
+    private int jumpCount = 0;
+    public int maxJumps = 2;
+    public bool dash = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,14 +32,24 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-            if (Input.GetKeyDown(KeyCode.Space) && isOnGround && !gameOver)
+           if (Input.GetKeyDown(KeyCode.Space) && jumpCount < maxJumps && !gameOver)
             {
                 playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-                isOnGround = false;
-                 playerAnim.SetTrigger("Jump_trig");
-                 dirtParticle.Stop();
-                 playerAudio.PlayOneShot(jumpSound, 1.0f);
-            }
+                jumpCount++;
+                playerAnim.SetTrigger("Jump_trig");
+                dirtParticle.Stop();
+                playerAudio.PlayOneShot(jumpSound, 1.0f);
+             }
+
+             if ( Input.GetKey(KeyCode.A))
+             {
+                dash = true;
+             }
+
+             else
+             {
+                dash = false;
+             }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -43,6 +58,7 @@ public class PlayerController : MonoBehaviour
          {
            isOnGround = true; 
            dirtParticle.Play();
+           jumpCount = 0;
          }
          else if (collision.gameObject.CompareTag("Obstacle"))
          {
